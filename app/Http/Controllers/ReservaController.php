@@ -8,16 +8,15 @@ use App\Models\Mesa;
 use App\Models\Factura;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\FacturaMail;
 use App\Mail\ConfirmacionReserva;
+use Illuminate\Support\Facades\DB;
+
 
 class ReservaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
         $reservas = Reserva::with(['cliente', 'mesa', 'usuario'])
             ->orderBy('fecha_reserva', 'desc')
             ->orderBy('hora_reserva', 'desc')
@@ -26,44 +25,41 @@ class ReservaController extends Controller
         return view('reservas.index', compact('reservas'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
         $clientes = Cliente::all();
         $mesas = Mesa::where('disponible', true)->get();
         return view('reservas.create', compact('clientes', 'mesas'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
         $validated = $request->validate([
-            'cliente_id' => 'required|exists:clientes,id',
-            'mesa_id' => 'required|exists:mesas,id',
-            'fecha_reserva' => 'required|date|after_or_equal:today',
-            'hora_reserva' => 'required',
-            'numero_personas' => 'required|integer|min:1',
-            'notas' => 'nullable|string'
-        ]);
+        'cliente_id' => 'required|exists:clientes,id',
+        'mesa_id' => 'required|exists:mesas,id',
+        'fecha_reserva' => 'required|date|after_or_equal:today',
+        'hora_reserva' => 'required',
+        'numero_personas' => 'required|integer|min:1',
+        'notas' => 'nullable|string'
+    ]);
 
-        // Verificar disponibilidad
-        $mesa = Mesa::find($validated['mesa_id']);
-        if (!$mesa->estaDisponible($validated['fecha_reserva'], $validated['hora_reserva'])) {
-            return back()->withErrors(['mesa_id' => 'La mesa no está disponible para esa fecha y hora.']);
-        }
+    // Verificar disponibilidad
+    $mesa = Mesa::find($validated['mesa_id']);
+    if (!$mesa->estaDisponible($validated['fecha_reserva'], $validated['hora_reserva'])) {
+        return back()->withErrors(['mesa_id' => 'La mesa no está disponible para esa fecha y hora.']);
+    }
 
-        // Calcular precio total (ENTEROS para Colombia)
-        $precio_total = $mesa->precio_base * $validated['numero_personas'];
+    // Calcular precio total
+    $precio_total = $mesa->precio_base * $validated['numero_personas'];
 
+    // Usar transacción para asegurar consistencia
+    \DB::beginTransaction();
+
+    try {
         $reserva = Reserva::create($validated + [
             'user_id' => auth()->id(),
-            'precio_total' => $precio_total
+            'precio_total' => $precio_total,
+            'estado' => 'confirmada'
         ]);
 
         // Generar factura automáticamente
@@ -72,45 +68,46 @@ class ReservaController extends Controller
             'numero_factura' => 'FACT-' . date('Ymd') . '-' . str_pad($reserva->id, 6, '0', STR_PAD_LEFT),
             'fecha_emision' => now(),
             'subtotal' => $precio_total,
-            'impuestos' => round($precio_total * 0.19), // 19% IVA Colombia
+            'impuestos' => round($precio_total * 0.19),
             'total' => $precio_total + round($precio_total * 0.19),
             'estado' => 'pendiente'
         ]);
 
-        // Enviar email de confirmación (opcional)
-        Mail::to($reserva->cliente->email)->send(new ConfirmacionReserva($reserva));
+        // Cargar relaciones para el email
+        $factura->load('reserva.cliente', 'reserva.mesa');
+
+        // ENVIAR EMAIL CON LA FACTURA - ¡ESTO ES LO QUE FALTABA!
+        Mail::to($reserva->cliente->email)->send(new \App\Mail\FacturaMail($factura));
+
+        \DB::commit();
 
         return redirect()->route('reservas.show', $reserva)
-            ->with('success', 'Reserva creada exitosamente. Factura generada.');
+            ->with('success', 'Reserva creada exitosamente. Factura generada y enviada por correo.');
+
+    } catch (\Exception $e) {
+        \DB::rollBack();
+        
+        \Log::error('Error creando reserva: ' . $e->getMessage());
+        
+        return back()->with('error', 'Hubo un error creando la reserva: ' . $e->getMessage());
+    }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Reserva $reserva) // CORREGIDO: string $id → Reserva $reserva
     {
-        //
         $reserva->load(['cliente', 'mesa', 'usuario', 'factura']);
         return view('reservas.show', compact('reserva'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Reserva $reserva) // CORREGIDO: string $id → Reserva $reserva
     {
-        //
         $clientes = Cliente::all();
         $mesas = Mesa::where('disponible', true)->get();
         return view('reservas.edit', compact('reserva', 'clientes', 'mesas'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Reserva $reserva) // CORREGIDO: string $id → Reserva $reserva
     {
-        //
         $validated = $request->validate([
             'cliente_id' => 'required|exists:clientes,id',
             'mesa_id' => 'required|exists:mesas,id',
@@ -142,12 +139,9 @@ class ReservaController extends Controller
             ->with('success', 'Reserva actualizada exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Reserva $reserva) // CORREGIDO: string $id → Reserva $reserva
     {
-         $reserva->delete();
+        $reserva->delete();
         return redirect()->route('reservas.index')
             ->with('success', 'Reserva eliminada exitosamente.');
     }
@@ -175,5 +169,3 @@ class ReservaController extends Controller
         return response()->json($mesasDisponibles);
     }
 }
-    
-

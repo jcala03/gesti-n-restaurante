@@ -70,41 +70,7 @@
                 </table>
             </div>
 
-            <!-- Estadísticas -->
-            <div class="row mt-4">
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6>Confirmadas</h6>
-                            <h4 class="text-success">{{ $reservas->where('estado', 'confirmada')->count() }}</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6>Canceladas</h6>
-                            <h4 class="text-danger">{{ $reservas->where('estado', 'cancelada')->count() }}</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6>Completadas</h6>
-                            <h4 class="text-info">{{ $reservas->where('estado', 'completada')->count() }}</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6>Ingresos Totales</h6>
-                            <h4 class="text-warning">${{ number_format($reservas->sum('precio_total'), 0, ',', '.') }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         @else
             <div class="text-center py-4">
                 <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>

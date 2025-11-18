@@ -1,54 +1,39 @@
-@extends('layouts.app')
-
-@section('page-title', 'Registrar Nuevo Cliente')
-
-@section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Información del Cliente</h5>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cliente - Sistema Simple</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Crear Cliente (Versión Emergencia)</h2>
+        
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+        
+        <form action="{{ route('clientes.store') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre *</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
             </div>
-            <div class="card-body">
-                <form action="{{ route('clientes.store') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre *</label>
-                        <input type="text" class="form-control @error('nombre') is-invalid @enderror" 
-                               id="nombre" name="nombre" 
-                               value="{{ old('nombre') }}" required>
-                        @error('nombre')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email *</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" 
-                               value="{{ old('email') }}" required>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Teléfono *</label>
-                        <input type="text" class="form-control @error('telefono') is-invalid @enderror" 
-                               id="telefono" name="telefono" 
-                               value="{{ old('telefono') }}" required>
-                        @error('telefono')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ route('clientes.index') }}" class="btn btn-secondary me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Registrar Cliente</button>
-                    </div>
-                </form>
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email *</label>
+                <input type="email" class="form-control" id="email" name="email" required>
             </div>
-        </div>
+            
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono *</label>
+                <input type="text" class="form-control" id="telefono" name="telefono" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Registrar Cliente</button>
+            <a href="{{ route('clientes.index') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
     </div>
-</div>
-@endsection
+</body>
+</html>

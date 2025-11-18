@@ -69,40 +69,7 @@
                 </table>
             </div>
 
-            <div class="row mt-4">
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5>Total Mesas</h5>
-                            <h3 class="text-primary">{{ $mesas->count() }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5>Disponibles</h5>
-                            <h3 class="text-success">{{ $mesas->where('disponible', true)->count() }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5>Capacidad Total</h5>
-                            <h3 class="text-info">{{ $mesas->sum('capacidad') }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h5>Precio Promedio</h5>
-                            <h3 class="text-warning">${{ number_format($mesas->avg('precio_base'), 0, ',', '.') }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         @else
             <div class="text-center py-4">
                 <i class="fas fa-chair fa-3x text-muted mb-3"></i>

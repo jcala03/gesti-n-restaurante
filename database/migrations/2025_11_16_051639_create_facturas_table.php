@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('subtotal');
             $table->integer('impuestos');
             $table->integer('total');
-            $table->enum('metodo_pago', ['efectivo', 'tarjeta', 'transferencia'])->default('efectivo');
+            $table->enum('estado', ['pendiente', 'pagada', 'cancelada'])->default('pendiente');
             $table->timestamps();
         });
     }

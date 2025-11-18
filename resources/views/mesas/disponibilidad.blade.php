@@ -48,7 +48,7 @@
                                 <small>
                                     <strong>Reservada:</strong><br>
                                     @foreach($mesa->reservas as $reserva)
-                                        {{ $reserva->hora_reserva }} - {{ $reserva->cliente->nombre_completo }}<br>
+                                        {{ $reserva->hora_reserva }} - {{ $reserva->cliente->nombre }}<br>
                                     @endforeach
                                 </small>
                             </div>

@@ -44,7 +44,7 @@ class MesaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Mesa $mesa)
     {
         return view('mesas.show', compact('mesa'));
     }
@@ -52,7 +52,7 @@ class MesaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Mesa $mesa)
     {
         return view('mesas.edit', compact('mesa'));
     }
@@ -60,7 +60,7 @@ class MesaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Mesa $mesa)
     {
         $validated = $request->validate([
             'numero_mesa' => 'required|string|unique:mesas,numero_mesa,' . $mesa->id,
@@ -78,7 +78,7 @@ class MesaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Mesa $mesa)
     {
         //
         $mesa->delete();
@@ -89,7 +89,7 @@ class MesaController extends Controller
 
     public function disponibilidad(Request $request)
     {
-        $fecha = $request->get('fecha', today()->format('Y-m-d'));
+        $fecha = $request->get('fecha', today()->format('d-m-Y'));
         $mesas = Mesa::with(['reservas' => function($query) use ($fecha) {
             $query->where('fecha_reserva', $fecha)
                   ->where('estado', 'confirmada');

@@ -28,7 +28,7 @@
                             </td>
                             <td>
                                 <a href="{{ route('clientes.show', $factura->reserva->cliente) }}" class="text-decoration-none">
-                                    {{ $factura->reserva->cliente->nombre_completo }}
+                                    {{ $factura->reserva->cliente->nombre }}
                                 </a>
                             </td>
                             <td>{{ $factura->fecha_emision->format('d/m/Y') }}</td>
@@ -61,43 +61,7 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
-
-            <!-- Estadísticas -->
-            <div class="row mt-4">
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6>Total Facturas</h6>
-                            <h4 class="text-primary">{{ $facturas->count() }}</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6>Pagadas</h6>
-                            <h4 class="text-success">{{ $facturas->where('estado', 'pagada')->count() }}</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6>Pendientes</h6>
-                            <h4 class="text-warning">{{ $facturas->where('estado', 'pendiente')->count() }}</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-light">
-                        <div class="card-body text-center">
-                            <h6>Ingresos Totales</h6>
-                            <h4 class="text-info">${{ number_format($facturas->sum('total'), 0, ',', '.') }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         @else
             <div class="text-center py-4">
                 <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>

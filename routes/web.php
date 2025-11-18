@@ -21,9 +21,9 @@ Route::middleware(['auth'])->group(function () {
     // Client Routes
     Route::resource('clientes', ClienteController::class);
 
-    // Mesa Routes  
-    Route::resource('mesas', MesaController::class);
+    // Mesa Routes - CORREGIDO: ruta personalizada PRIMERO
     Route::get('mesas/disponibilidad', [MesaController::class, 'disponibilidad'])->name('mesas.disponibilidad');
+    Route::resource('mesas', MesaController::class);
 
     // Reservation Routes
     Route::resource('reservas', ReservaController::class);
