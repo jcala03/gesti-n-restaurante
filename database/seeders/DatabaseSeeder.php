@@ -27,10 +27,10 @@ class DatabaseSeeder extends Seeder
 
         // Usuario dueño - SOLO UNA VEZ
         User::firstOrCreate(
-            ['email' => 'todos.son.cacorros.menos.yo@cuc.edu.co'],
+            ['email' => 'admin@gmail.com'],
             [
-                'name' => 'Yo',
-                'password' => Hash::make('password'),
+                'name' => 'jesus',
+                'password' => Hash::make('12345678'),
                 'role' => 'owner'
             ]
         );
